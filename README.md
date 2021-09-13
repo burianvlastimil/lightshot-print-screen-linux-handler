@@ -8,6 +8,16 @@ This script handles global print screen key strokes for you to fully enjoy [Ligh
 
 It is a standard [POSIX](https://en.wikipedia.org/wiki/POSIX) (wiki) shell script, it should work in any [Linux](https://en.wikipedia.org/wiki/Linux) (wiki) distribution (more precisely, your [shell](https://en.wikipedia.org/wiki/Unix_shell) (wiki)).
 
+## What the script does NOT
+
+- It does not download Lightshot for you.
+- It does not install Lightshot for you.
+- It does not launch Lightshot for you! This is very important.
+
+## What the script does actually
+
+This script's sole purpose is to simulate (send) hotkey to Lightshot, be it Print, Control + Print, or anything else completely.
+
 ***
 
 ## Requirements
