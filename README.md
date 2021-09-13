@@ -56,20 +56,28 @@ which will point out the possibility for you to feed the key combination you hav
 
 ```
 Script  : Lightshot print screen Linux handler
-Version : 5.4
+Version : 6.0 (final)
 GitHub  : https://git.io/fx2US
--------------------------------------------------------------------
+--------------------------------------------------------------------
 Description: This script works with XDOTOOL to trigger Print Screen
-key combination in Lightshot application installed on Linux in Wine
--------------------------------------------------------------------
-Usage: ./lightshot_print_screen [-k "HotKey"]
+key combination in Lightshot application installed on Linux in Wine.
+License: GPL 3.0. The code itself can be further enhanced by others.
+The script, however, won't launch Lightshot for you due to variable
+installation locations which make it impossible. You need to run it!
+--------------------------------------------------------------------
+Usage in terminal: ./$(basename "$0") [-k "HotKey"]
 
-    -k "HotKey": Optional switch requiring one argument,
+    -k 'HotKey': Optional switch requiring one argument,
         which is the print screen hotkey combination.
         For the left Control key and the Print Screen key
-        that would be "Control_L+Print" (as an example).
+        that would be 'Control_L+Print' (as an example).
 
     -h: Show this help.
+
+Usage in desktop environment:
+
+    You need to find Keyboard shortcuts, and re-map Print to run
+    this script, an example from Linux Mint is placed on GitHub.
 ```
 
 ### Graphical interface
