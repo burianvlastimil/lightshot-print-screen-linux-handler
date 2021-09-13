@@ -48,7 +48,7 @@ Note, that you will be able to avoid this step of changing permissions if you do
 
 ### General
 
-Place it somewhere and put a path to it e.g. in Linux Mint 20 Cinnamon to the:
+Now you need to place it somewhere, e.g. to your home directory inside `~/bin`, and put a path to it e.g. in Linux Mint 20 Cinnamon to the:
 
 **Keyboard** → **Shortcuts** → **Custom Shortcuts** → click on button named **Add custom shortcut** and fill the form out.
 
