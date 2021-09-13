@@ -38,7 +38,7 @@ Note, that you will be able to avoid this step of changing permissions if you do
 
 ### General
 
-Place it somewhere and put a path to it e.g. in Linux Mint 19.3 Cinnamon to the:
+Place it somewhere and put a path to it e.g. in Linux Mint 20 Cinnamon to the:
 
 **Keyboard** → **Shortcuts** → **Custom Shortcuts** → click on button named **Add custom shortcut** and fill the form out.
 
@@ -65,7 +65,7 @@ License: GPL 3.0. The code itself can be further enhanced by others.
 The script, however, won't launch Lightshot for you due to variable
 installation locations which make it impossible. You need to run it!
 --------------------------------------------------------------------
-Usage in terminal: ./$(basename "$0") [-k "HotKey"]
+Usage in terminal: ./lightshot_print_screen [-k "HotKey"]
 
     -k 'HotKey': Optional switch requiring one argument,
         which is the print screen hotkey combination.
@@ -86,9 +86,9 @@ There is none. This script however launches the Lightshot print screen editor di
 
 ***
 
-## Screenshot from Linux Mint 19.3 Cinnamon
+## Screenshot from Linux Mint 20 Cinnamon
 
-![Screenshot from Linux Mint 19.3](https://www.vlastimilburian.cz/github_images/lightshot-linux-mint-19.png)
+![Screenshot from Linux Mint 20](https://www.vlastimilburian.cz/github_images/lightshot-linux-mint-20.png)
 
 ***
 
