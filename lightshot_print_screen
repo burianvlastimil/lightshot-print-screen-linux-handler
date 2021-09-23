@@ -269,7 +269,7 @@ check_requirements ()
 
 check_requirements \
     'pgrep'      'procps' \
-    'xdotool'    'xdotool' \
+    'xdotool'    'xdotool'
 
 print_usage_and_exit ()
 {
