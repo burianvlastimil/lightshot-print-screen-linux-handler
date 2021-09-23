@@ -1,5 +1,3 @@
-# Reason for archiving this repository is the script is finished.
-
 [![Download the latest version](https://img.shields.io/badge/Download-Latest%20version-orange)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/releases/latest) &nbsp; &nbsp; &nbsp; &nbsp; [![Donate via PayPal](https://img.shields.io/badge/Donate%20%24-via%20PayPal-%23013088)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler#donations) &nbsp; &nbsp; &nbsp; &nbsp; [![GPLv3 License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/blob/master/LICENSE) &nbsp; &nbsp; &nbsp; &nbsp; [![ShellCheck Passing](https://img.shields.io/badge/ShellCheck-Passing-brightgreen)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler)
 
 ***
