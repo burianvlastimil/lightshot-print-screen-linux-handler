@@ -114,6 +114,21 @@ Please open a [new issue ticket](https://github.com/burianvlastimil/lightshot-pr
 
 Donations are possible via my PayPal account issued on the same email address as mentioned above.
 
-Or you can directly scan the below QR code with PayPal app on your smartphone.
+### Donate via Bank
 
-![My PayPal QR Code](https://www.vlastimilburian.cz/github_images/paypal_qrcode.png)
+If, for any reason, you cannot use PayPal, my bank account number is:
+
+**Czech** (National Bank Account Number):
+```
+4423481043/0800
+```
+
+**IBAN** (International Bank Account Number):
+```
+CZ16 0800 0000 0044 2348 1043
+```
+
+**BIC/SWIFT** (Business Identifier Code):
+```
+GIBACZPX
+```
