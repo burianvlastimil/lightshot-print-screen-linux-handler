@@ -1,221 +1,168 @@
 #!/bin/sh
 
-#+------------------------------------------------------------------------------+
-#|                     Lightshot print screen Linux handler                     |
-#|                         Language: POSIX shell script                         |
-#|                     Copyright: 2018-2021 Vlastimil Burian                    |
-#|                      M@il: info[..]vlastimilburian[..]cz                     |
-#|                               License: GPL 3.0                               |
-#|                             Version: 6.0 (final)                             |
-#|                         GitHub: https://git.io/fx2US                         |
-#+------------------------------------------------------------------------------+
+#------------------------------------------------------------
+#--          Lightshot print screen Unix handler           --
+#--           Code language: POSIX shell script            --
+#--         Copyright: 2018-2023 Vlastimil Burian          --
+#--             Bugs: info@vlastimilburian.cz              --
+#--              GitHub: https://git.io/fx2US              --
+#--                    License: GPL 3.0                    --
+#--                 Version: 7.0 (stable)                  --
+#--                 Released: 2023-Oct-13                  --
+#------------------------------------------------------------
 
-# global shell script variable(s)
+# Global shell script variable(s):
 
-# the hotkey variable for easy set-up; overridable with -k switch,
-# run this script with -h for complete help to this script; just run it to test out
-# set this to the same hotkey which you have set up in your Lightshot options
-# for the left control key and the print screen key put in Control_L+Print
+# The hotkey variable for easy set-up; overridable with -k switch.
+# Run this script with -h for complete help to this script with an example.
+# Just run this script to test out, it will print out if Lightshot was found.
+# Set this to the same hotkey which you have set up in your Lightshot options.
+# For the left control key and the print screen key put in Control_L+Print.
 hotkey='Print'
 
-# global shell script option(s)
+# Global shell script option(s):
 
-# treat unset variables as an error when substituting
-# clarification: this means that accessing any unassigned variable
-# produces immediate termination of the script with an error produced
+# Treat unset variables as an error when substituting.
+# Clarification: this means that accessing any unassigned variable
+# produces immediate termination of the script with an error printed.
 set -o nounset
 
-tput_setup_nix ()
-# Linux `tput` uses terminfo
+# Linux uses terminfo; BSD uses termcap; the null command (:) ignores everything after.
+tput_init_linux() { set_fg_color='tput setaf'; reset_color=$(tput sgr0 2>/dev/null); }
+tput_init_bsd()   { set_fg_color='tput AF';    reset_color=$(tput me   2>/dev/null); }
+tput_init_none()  { set_fg_color=:;            reset_color=;                         }
+
+# This routine prepares `tput` on Linux or BSD and no color console.
+if tput setaf >/dev/null 2>&1; then tput_init_linux else tput_init_none;
+elif tput AF  >/dev/null 2>&1; then tput_init_bsd   else tput_init_none;
+else tput_init_none; fi
+
+# In this place we use the $set_fg_color command to set the color sequences.
+colorize()
 {
-    tput_cmd_set_fg_color='tput setaf'
-    tput_number_of_colors=$(tput colors 2> /dev/null) &&
-    tput_bold=$(tput bold 2> /dev/null) &&
-    tput_reset=$(tput sgr0 2> /dev/null)
-}
-
-tput_setup_bsd ()
-# BSD `tput` uses termcap
-{
-    tput_cmd_set_fg_color='tput AF'
-    tput_number_of_colors=$(tput Co 2> /dev/null) &&
-    tput_bold=$(tput md 2> /dev/null) &&
-    tput_reset=$(tput me 2> /dev/null)
-}
-
-tput_setup_none ()
-# no unset variables allowed due to `set -u`
-{
-    tput_cmd_set_fg_color=
-    tput_number_of_colors=
-    tput_bold=
-    tput_reset=
-}
-
-# this routine prepares `tput` on Linux and BSD
-tput_setup_none
-
-if command -v tput > /dev/null 2>&1; then
-
-    if tput setaf > /dev/null 2>&1; then
-
-        tput_setup_nix || tput_setup_none
-
-    elif tput AF > /dev/null 2>&1; then
-
-        tput_setup_bsd || tput_setup_none
-
-    fi
-
-fi
-
-# shellcheck disable=SC2120
-is_script_running_interactively ()
-# function to determine if stdin is connected (running interactively)
-{
-    if [ "$#" -ne 0 ]; then
-        printf >&2 '%s\n' \
-            "is_script_running_interactively() input check" \
-            "Some argument(s) was/were passed to the function!" \
-            "No argument expected. Passed: $#: $*"
-        exit 1
-    fi
-    # test if file descriptor 0 = standard input is connected to the terminal
-    [ -t 0 ]
-}
-
-is_terminal_tput_capable ()
-# function to test `tput` availability and capability
-{
-    # shellcheck disable=SC2119
-    [ -n "$tput_cmd_set_fg_color" ] && [ -n "$tput_number_of_colors" ] && [ -n "$tput_bold" ] && [ -n "$tput_reset" ] &&
-    is_script_running_interactively && [ "$tput_number_of_colors" -ge 8 ] &&
-    { $tput_cmd_set_fg_color 1 && printf '%s\n' "${tput_bold}TEST$tput_reset"; } > /dev/null 2>&1
-}
-
-if is_terminal_tput_capable; then
-    # setup of the most basic color set
-    color_red=$tput_bold$($tput_cmd_set_fg_color 1)
-    color_green=$tput_bold$($tput_cmd_set_fg_color 2)
-    color_yellow=$tput_bold$($tput_cmd_set_fg_color 3)
-    color_blue=$tput_bold$($tput_cmd_set_fg_color 4)
-    color_magenta=$tput_bold$($tput_cmd_set_fg_color 5)
-    color_cyan=$tput_bold$($tput_cmd_set_fg_color 6)
-    color_white=$tput_bold$($tput_cmd_set_fg_color 7)
-else
-    # no unset variables allowed, due to `set -u`
-    color_red=
-    color_green=
-    color_yellow=
-    color_blue=
-    color_magenta=
-    # shellcheck disable=SC2034
-    color_cyan=
-    color_white=
-fi
-
-is_integer ()
-# function to test one variable for integer, generic
-{
-    if [ "$#" -ne 1 ]; then
-        printf >&2 '%s\n' \
-            "is_integer() input check" \
-            "Single argument was not passed to the function!" \
-            "One variable to test expected. Passed: $#: $*"
-        exit 1
-    fi
-    case "${1#[+-]}" in
-        (*[!0123456789]*) return 1 ;;
-        ('')              return 1 ;;
-        (*)               return 0 ;;
-    esac
-}
-
-is_unsigned_integer ()
-# function using is_integer(), but only unsigned integers pass it
-{
-    if [ "$#" -ne 1 ]; then
-        printf >&2 '%s\n' \
-            "is_unsigned_integer() input check" \
-            "Single argument was not passed to the function!" \
-            "One variable to test expected. Passed: $#: $*"
-        exit 1
-    fi
     case "$1" in
-        ([+-]*) return 1 ;;
+        (none)
+            printf '%s' "$reset_color"
+        ;;
+        (red)
+            $set_fg_color 1
+        ;;
+        (green)
+            $set_fg_color 2
+        ;;
+        (yellow)
+            $set_fg_color 3
+        ;;
+        (blue)
+            $set_fg_color 4
+        ;;
+        (magenta)
+            $set_fg_color 5
+        ;;
+        (cyan)
+            $set_fg_color 6
+        ;;
+        (white)
+            $set_fg_color 7
+        ;;
     esac
-    is_integer "$1"
 }
 
-is_valid_exit_code ()
-# function using is_unsigned_integer(), but limiting the valid input
-# to unsigned integer in a range <0;125> which is "safe",
-# the remaining range is reserved or otherwise not recommended
+# Here we define common color variables named using our colorize() function.
+color_red=$(colorize red)
+color_green=$(colorize green)
+color_yellow=$(colorize yellow)
+color_blue=$(colorize blue)
+color_magenta=$(colorize magenta)
+# shellcheck disable=SC2034
+color_cyan=$(colorize cyan)
+color_white=$(colorize white)
+color_none=$(colorize none)
+
+# (bool) Function to test a variable for an integer.
+is_int()
 {
-    if [ "$#" -ne 1 ]; then
-        printf >&2 '%s\n' \
-            "is_valid_exit_code() input check" \
-            "Single argument was not passed to the function!" \
-            "One variable to test expected. Passed: $#: $*"
-        exit 1
-    fi
-    is_unsigned_integer "$1" && [ "$1" -le 125 ]
+    case "${1#[+-]}" in
+
+        (*[!0123456789]*)
+            return 1
+        ;;
+        ('')
+            return 1
+        ;;
+        (*)
+            return 0
+        ;;
+
+    esac
 }
 
-dump_args ()
-# function to detect basic variable types passed to my functions:
-# empty, integer, file (specific info), the rest is considered string
+# (bool) Function to test a variable for an unsigned integer.
+is_uint()
+{
+    case "$1" in
+
+        ([+-]*)
+            return 1
+        ;;
+
+    esac
+
+    is_int "$1"
+}
+
+# (bool) Function to test a variable for a "safe" exit code:
+# From unsigned integer in a range <0;125> which is safe range,
+# the remaining range is reserved or otherwise not recommended.
+is_safe_exit_uint()
+{
+    is_uint "$1" && [ "$1" -le 125 ]
+}
+
+# (string) Function to detect basic variable types passed to my functions.
+# empty, integer, file (with specific info), the rest is considered string
+dump_args()
 {
     # we do not write anything for 0 arguments
     [ "$#" -eq 0 ] && return 1
-
+    exec >&2
     i=1
     printf '%s\n' \
-        "${color_yellow}dump_args()$tput_reset" \
-        "$color_white$# arguments inspected:$tput_reset"
+        "${color_yellow}dump_args()$color_none" \
+        "$color_white$# arguments inspected:$color_none"
     while [ "$#" -gt 0 ]; do
-        printf "[$color_white%d$tput_reset]: '%s' " "$i" "$1"
+        printf "[$color_white%d$color_none]: '%s' " "$i" "$1"
         if [ -z "$1" ]; then
-            printf '%s' "(${color_blue}empty$tput_reset)"
-        elif is_integer "$1"; then
-            printf '%s' "(${color_green}integer$tput_reset)"
+            printf '%s' "(${color_blue}empty$color_none)"
+        elif is_int "$1"; then
+            printf '%s' "(${color_green}integer$color_none)"
         elif [ -e "$1" ]; then
-            printf '%s' "(${color_magenta}file: $(file -b "$1")$tput_reset)"
+            printf '%s' "(${color_magenta}file: $(file -b "$1")$color_none)"
         else
-            printf '%s' "(${color_red}string$tput_reset)"
+            printf '%s' "(${color_red}string$color_none)"
         fi
         printf '\n'
         shift
         i=$(( i + 1 ))
     done
-} >&2
+}
 
-print_error ()
-# function to print error messages
+# (string) Function to print an error message.
+print_error()
 {
-    if ! { [ "$#" -eq 2 ] && [ -n "$1" ] && [ -n "$2" ]; } then
-        dump_args "$@"
-        # shellcheck disable=SC2016
-        printf '%s\n' \
-            'print_error() input check' \
-            'Wrong number, type or empty arguments have been passed to the function.' \
-            'Expected the following strings: $1 = error heading, $2 = error message.'
-        exit 1
-    fi
-    printf '%s\n' \
+    printf >&2 '%s\n' \
         "Error heading: $1" \
         "Error message: $2"
+}
 
-} >&2
-
-print_error_and_exit ()
-# function to print error messages and exit right away
+# (string) Function to print an error message and exit right away.
+print_error_and_exit()
 {
     if ! { [ "$#" -eq 2 ] && [ -n "$1" ] && [ -n "$2" ]; } &&
-       ! { [ "$#" -eq 3 ] && [ -n "$1" ] && [ -n "$2" ] && is_valid_exit_code "$3" && [ "$3" -ge 1 ]; } then
+       ! { [ "$#" -eq 3 ] && [ -n "$1" ] && [ -n "$2" ] && [ "$3" -ge 1 ] && is_safe_exit_uint "$3"; } then
         dump_args "$@"
         # shellcheck disable=SC2016
-        printf '%s\n' \
+        printf >&2 '%s\n' \
             'print_error_and_exit() input check' \
             'Wrong number, type or empty arguments have been passed to the function.' \
             'Expected the following strings: $1 = error heading, $2 = error message.' \
@@ -225,15 +172,11 @@ print_error_and_exit ()
     fi
     print_error "$1" "$2"
     exit "${3:-1}"
-} >&2
+}
 
 # shellcheck disable=SC2120
-is_user_root ()
+is_user_root()
 {
-    if [ "$#" -ne 0 ]; then
-        dump_args "$@"
-        print_error_and_exit 'is_user_root() input check' 'Some arguments have been passed to the function! No arguments expected.'
-    fi
     [ "$(id -u)" -eq 0 ]
 }
 
@@ -242,7 +185,7 @@ if is_user_root; then
     print_error_and_exit 'is_user_root()' 'Running this script with root privileges is not recommended! Expected normal user.'
 fi
 
-check_requirements ()
+check_requirements()
 {
     if [ "$#" -eq 0 ]; then
         print_error_and_exit 'check_requirements() input check' 'No arguments passed to the function! At least one program/package name pair expected.'
@@ -255,7 +198,7 @@ check_requirements ()
     dependency_missing=false
 
     while [ "$#" -gt 0 ]; do
-        if ! command -v "$1" > /dev/null 2>&1; then
+        if ! command -v "$1" >/dev/null 2>&1; then
             dependency_missing=true
             print_error 'check_requirements(): required dependency' "This script requires '$1' program but it is not available on this system! On a usual OS, please install '$2' package."
         fi
@@ -271,21 +214,21 @@ check_requirements \
     'pgrep'      'procps' \
     'xdotool'    'xdotool'
 
-print_usage_and_exit ()
+print_usage_and_exit()
 {
-    if ! { [ "$#" -eq 1 ] && is_valid_exit_code "$1"; } then
+    if ! { [ "$#" -eq 1 ] && is_safe_exit_uint "$1"; } then
         dump_args "$@"
         # shellcheck disable=SC2016
         print_error_and_exit 'print_usage_and_exit() input check' 'Number required: $1 = exit code from the script.'
     fi
     [ "$1" -ne 0 ] && exec >&2
-cat << EOF
-Script  : Lightshot print screen Linux handler
-Version : 6.0 (final)
+cat <<EOF
+Script  : Lightshot print screen Unix handler
+Version : 7.0 (stable)
 GitHub  : https://git.io/fx2US
 --------------------------------------------------------------------
 Description: This script works with XDOTOOL to trigger Print Screen
-key combination in Lightshot application installed on Linux in Wine.
+key combination in Lightshot application installed on Unix in Wine.
 License: GPL 3.0. The code itself can be further enhanced by others.
 The script, however, won't launch Lightshot for you due to variable
 installation locations which make it impossible. You need to run it!
@@ -308,11 +251,21 @@ EOF
 }
 
 while getopts ":hk:" cli_option; do
+
     case "$cli_option" in
-        (k) hotkey=$OPTARG        ; break ;;
-        (h) print_usage_and_exit 0; break ;;
-        (*) print_usage_and_exit 1; break ;;
+
+        (k)
+            hotkey=$OPTARG
+        ;;
+        (h)
+            print_usage_and_exit 0
+        ;;
+        (*)
+            print_usage_and_exit 1
+        ;;
+
     esac
+
 done
 shift $(( OPTIND - 1 ))
 
@@ -321,7 +274,7 @@ if [ "$#" -ne 0 ]; then
     print_usage_and_exit 1
 fi
 
-get_process_id ()
+get_process_id()
 {
     if ! { [ "$#" -eq 1 ] && [ -n "$1" ]; } then
         dump_args "$@"
@@ -332,33 +285,34 @@ get_process_id ()
     pgrep -o "$1"
 }
 
-get_window_id ()
+get_window_id()
 {
-    if ! { [ "$#" -eq 2 ] && is_unsigned_integer "$1" && [ -n "$2" ]; } then
+    if ! { [ "$#" -eq 2 ] && is_uint "$1" && [ -n "$2" ]; } then
         dump_args "$@"
         print_error_and_exit 'get_window_id() input check' "Two valid arguments were not passed to the function! Expected a process id (unsigned integer) and a window name (string)."
     fi
     #--all  : Require all conditions to be met.
+    #--sync : Wait until a search result is found.
     #--limit: Stop searching after finding N matching windows.
     #--pid  : Match windows that belong to a specific process id.
     #--name : Match against the window name. This is the same string that is displayed in the window titlebar.
-    if ! xdotool search --all --limit 1 --pid "$1" --name "$2"; then
+    if ! xdotool search --all --sync --limit 1 --pid "$1" --name "$2"; then
         print_error_and_exit 'get_window_id()' "No window matching process id '$1' and window name '$2' has been found."
     fi
 }
 
 lightshot_process_id=$(get_process_id Lightshot.exe)
 
-if ! is_unsigned_integer "$lightshot_process_id"; then
+if ! is_uint "$lightshot_process_id"; then
     # shellcheck disable=SC2016
-    print_error_and_exit 'is_unsigned_integer $lightshot_process_id' "Lightshot process is not running. Launch Lightshot app first, please."
+    print_error_and_exit 'is_uint $lightshot_process_id' "Lightshot process is not running. Launch Lightshot app first, please."
 fi
 
 lightshot_window_id=$(get_window_id "$lightshot_process_id" Lightshot)
 
-if ! is_unsigned_integer "$lightshot_window_id"; then
+if ! is_uint "$lightshot_window_id"; then
     # shellcheck disable=SC2016
-    print_error_and_exit 'is_unsigned_integer $lightshot_window_id' 'Lightshot process was found (is running) but its window was not found for some reason / get_window_id() returned an empty value.'
+    print_error_and_exit 'is_uint $lightshot_window_id' 'Lightshot process was found (is running) but its window was not found for some reason / get_window_id() returned an empty value.'
 fi
 
 if xdotool key --window "$lightshot_window_id" "$hotkey"; then
