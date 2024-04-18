@@ -113,27 +113,3 @@ Please open a [new issue ticket](https://github.com/burianvlastimil/lightshot-pr
 ### Donate via PayPal
 
 Donations are possible via my PayPal account issued on the same email address as mentioned above.
-
-### Donate via Bank
-
-If, for any reason, you cannot use PayPal, my bank account number is as follows.
-
-**Account name** (same as my name):
-```
-Vlastimil Burián
-```
-
-**Czech** (National Bank Account Number):
-```
-4423481043/0800
-```
-
-**IBAN** (International Bank Account Number):
-```
-CZ16 0800 0000 0044 2348 1043
-```
-
-**BIC/SWIFT** (Business Identifier Code):
-```
-GIBACZPX
-```
