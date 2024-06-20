@@ -1,96 +1,87 @@
 #!/bin/sh
 
-#------------------------------------------------------------
-#--          Lightshot print screen Unix handler           --
-#--           Code language: POSIX shell script            --
-#--         Copyright: 2018-2023 Vlastimil Burian          --
-#--             Bugs: info@vlastimilburian.cz              --
-#--              GitHub: https://git.io/fx2US              --
-#--                    License: GPL 3.0                    --
-#--                 Version: 7.0 (stable)                  --
-#--                 Released: 2023-Oct-13                  --
-#------------------------------------------------------------
+#--------------------------------------------------------------------------------
+#--                    Lightshot print screen Linux handler                    --
+#--                     Git: https://burian.work/lightshot                     --
+#--                          Code: POSIX shell script                          --
+#--                                License: MIT                                --
+#--                                Version: 8.0                                --
+#--                          Released on: 2024-Jun-20                          --
+#--                    Copyright 2018-2024 Vlastimil Burián                    --
+#--                   E-mail: vlastimilburian@protonmail.com                   --
+#--------------------------------------------------------------------------------
 
 # Global shell script variable(s):
 
-# The hotkey variable for easy set-up; overridable with -k switch.
+# The hotkey variable is on top for easy set-up; overridable with -k switch.
 # Run this script with -h for complete help to this script with an example.
 # Just run this script to test out, it will print out if Lightshot was found.
 # Set this to the same hotkey which you have set up in your Lightshot options.
 # For the left control key and the print screen key put in Control_L+Print.
-hotkey='Print'
+hotkey=Print
 
 # Global shell script option(s):
 
-# Treat unset variables as an error when substituting.
+# Treat unset variables as errors when substituting.
 # Clarification: this means that accessing any unassigned variable
 # produces immediate termination of the script with an error printed.
 set -o nounset
 
-# Linux uses terminfo; BSD uses termcap; the null command (:) ignores everything after.
-tput_init_linux() { set_fg_color='tput setaf'; reset_color=$(tput sgr0 2>/dev/null); }
-tput_init_bsd()   { set_fg_color='tput AF';    reset_color=$(tput me   2>/dev/null); }
-tput_init_none()  { set_fg_color=:;            reset_color=;                         }
+tput_init_linux() { set_fg_color='tput setaf'; reset_color=$( tput sgr0 2>/dev/null ); }
+tput_init_bsd()   { set_fg_color='tput AF';    reset_color=$( tput me   2>/dev/null ); }
+tput_init_none()  { set_fg_color=:;            reset_color=;                           }
 
-# This routine prepares `tput` on Linux or BSD and no color console.
-if tput setaf >/dev/null 2>&1; then tput_init_linux else tput_init_none;
-elif tput AF  >/dev/null 2>&1; then tput_init_bsd   else tput_init_none;
-else tput_init_none; fi
+# This routine prepares `tput` on Linux or BSD and no-color console.
+if tput setaf >/dev/null 2>&1; then
+    # Linux uses terminfo
+    tput_init_linux
+    # These if-conditions are the most straight ways of determining `tput` capability.
+elif tput AF  >/dev/null 2>&1; then
+    # BSD uses termcap
+    tput_init_bsd
+else
+    # Null command (`:`) ignores everything after it
+    tput_init_none
+fi
 
-# In this place we use the $set_fg_color command to set the color sequences.
+# In this function we use the $set_fg_color command to set the color sequences.
 colorize()
 {
     case "$1" in
-        (none)
-            printf '%s' "$reset_color"
-        ;;
-        (red)
-            $set_fg_color 1
-        ;;
-        (green)
-            $set_fg_color 2
-        ;;
-        (yellow)
-            $set_fg_color 3
-        ;;
-        (blue)
-            $set_fg_color 4
-        ;;
-        (magenta)
-            $set_fg_color 5
-        ;;
-        (cyan)
-            $set_fg_color 6
-        ;;
-        (white)
-            $set_fg_color 7
-        ;;
+        red)     $set_fg_color 1 ;;
+        green)   $set_fg_color 2 ;;
+        yellow)  $set_fg_color 3 ;;
+        blue)    $set_fg_color 4 ;;
+        magenta) $set_fg_color 5 ;;
+        cyan)    $set_fg_color 6 ;;
+        white)   $set_fg_color 7 ;;
+        none)    printf '%s' "$reset_color" ;;
     esac
 }
 
-# Here we define common color variables named using our colorize() function.
-color_red=$(colorize red)
-color_green=$(colorize green)
-color_yellow=$(colorize yellow)
-color_blue=$(colorize blue)
-color_magenta=$(colorize magenta)
+# Finally, here we define common color variables named using our colorize() function.
+color_red=$(     colorize red )
+color_green=$(   colorize green )
+color_yellow=$(  colorize yellow )
+color_blue=$(    colorize blue )
+color_magenta=$( colorize magenta )
 # shellcheck disable=SC2034
-color_cyan=$(colorize cyan)
-color_white=$(colorize white)
-color_none=$(colorize none)
+color_cyan=$(    colorize cyan )
+color_white=$(   colorize white )
+color_none=$(    colorize none )
 
 # (bool) Function to test a variable for an integer.
 is_int()
 {
     case "${1#[+-]}" in
 
-        (*[!0123456789]*)
+        *[!0123456789]*)
             return 1
         ;;
-        ('')
+        '')
             return 1
         ;;
-        (*)
+        *)
             return 0
         ;;
 
@@ -102,7 +93,7 @@ is_uint()
 {
     case "$1" in
 
-        ([+-]*)
+        [+-]*)
             return 1
         ;;
 
@@ -111,7 +102,7 @@ is_uint()
     is_int "$1"
 }
 
-# (bool) Function to test a variable for a "safe" exit code:
+# (bool) Function to test a variable for a _safe_ exit code:
 # From unsigned integer in a range <0;125> which is safe range,
 # the remaining range is reserved or otherwise not recommended.
 is_safe_exit_uint()
@@ -119,8 +110,8 @@ is_safe_exit_uint()
     is_uint "$1" && [ "$1" -le 125 ]
 }
 
-# (string) Function to detect basic variable types passed to my functions.
-# empty, integer, file (with specific info), the rest is considered string
+# (string) Function to detect basic variable types passed to my functions:
+# empty, integer, file (with specific info), the rest is considered string.
 dump_args()
 {
     # we do not write anything for 0 arguments
@@ -137,7 +128,7 @@ dump_args()
         elif is_int "$1"; then
             printf '%s' "(${color_green}integer$color_none)"
         elif [ -e "$1" ]; then
-            printf '%s' "(${color_magenta}file: $(file -b "$1")$color_none)"
+            printf '%s' "(${color_magenta}file: $( file -b "$1" )$color_none)"
         else
             printf '%s' "(${color_red}string$color_none)"
         fi
@@ -177,12 +168,12 @@ print_error_and_exit()
 # shellcheck disable=SC2120
 is_user_root()
 {
-    [ "$(id -u)" -eq 0 ]
+    [ "$( id -u )" -eq 0 ]
 }
 
 # shellcheck disable=SC2119
 if is_user_root; then
-    print_error_and_exit 'is_user_root()' 'Running this script with root privileges is not recommended! Expected normal user.'
+    print_error_and_exit 'is_user_root()' 'Running this script with root privileges is not recommended! Expected an ordinary user.'
 fi
 
 check_requirements()
@@ -200,7 +191,7 @@ check_requirements()
     while [ "$#" -gt 0 ]; do
         if ! command -v "$1" >/dev/null 2>&1; then
             dependency_missing=true
-            print_error 'check_requirements(): required dependency' "This script requires '$1' program but it is not available on this system! On a usual OS, please install '$2' package."
+            print_error 'check_requirements(): unmet required dependency' "This script requires '$1' program but it is not available on this system! On Ubuntu/Debian OS, just install the '$2' package; other systems may differ."
         fi
         shift 2
     done
@@ -211,8 +202,8 @@ check_requirements()
 }
 
 check_requirements \
-    'pgrep'      'procps' \
-    'xdotool'    'xdotool'
+    pgrep      procps \
+    xdotool    xdotool
 
 print_usage_and_exit()
 {
@@ -221,24 +212,27 @@ print_usage_and_exit()
         # shellcheck disable=SC2016
         print_error_and_exit 'print_usage_and_exit() input check' 'Number required: $1 = exit code from the script.'
     fi
+
     [ "$1" -ne 0 ] && exec >&2
+
 cat <<EOF
-Script  : Lightshot print screen Unix handler
-Version : 7.0 (stable)
-GitHub  : https://git.io/fx2US
+Project: Lightshot print screen Linux handler
+Version: 8.0 (2024-Jun-20)
+GitHub : https://burian.work/lightshot
 --------------------------------------------------------------------
 Description: This script works with XDOTOOL to trigger Print Screen
-key combination in Lightshot application installed on Unix in Wine.
-License: GPL 3.0. The code itself can be further enhanced by others.
+key combination in Lightshot application installed on Linux in Wine.
 The script, however, won't launch Lightshot for you due to variable
 installation locations which make it impossible. You need to run it!
+License is MIT. The code can be further enhanced by others provided
+that any new copies have my copyright notice included in every case.
 --------------------------------------------------------------------
-Usage in terminal: ./$(basename "$0") [-k "HotKey"]
+Usage in terminal: ./$( basename "$0" ) [-k HotKey]
 
-    -k 'HotKey': Optional switch requiring one argument,
+    -k HotKey: Optional switch requiring one argument,
         which is the print screen hotkey combination.
         For the left Control key and the Print Screen key
-        that would be 'Control_L+Print' (as an example).
+        that would be -k Control_L+Print (as an example).
 
     -h: Show this help.
 
@@ -246,28 +240,32 @@ Usage in desktop environment:
 
     You need to find Keyboard shortcuts, and re-map Print to run
     this script, an example from Linux Mint is placed on GitHub.
+
+Author: Copyright 2018-2024 Vlastimil Burián, vlastimilburian@protonmail.com
 EOF
+
     exit "$1"
 }
 
-while getopts ":hk:" cli_option; do
+while getopts ':hk:' option; do
 
-    case "$cli_option" in
+    case "$option" in
 
-        (k)
+        k)
             hotkey=$OPTARG
+            shift 2
         ;;
-        (h)
+        h)
             print_usage_and_exit 0
         ;;
-        (*)
+        *)
+            dump_args "$@"
             print_usage_and_exit 1
         ;;
 
     esac
 
 done
-shift $(( OPTIND - 1 ))
 
 if [ "$#" -ne 0 ]; then
     dump_args "$@"
@@ -289,7 +287,7 @@ get_window_id()
 {
     if ! { [ "$#" -eq 2 ] && is_uint "$1" && [ -n "$2" ]; } then
         dump_args "$@"
-        print_error_and_exit 'get_window_id() input check' "Two valid arguments were not passed to the function! Expected a process id (unsigned integer) and a window name (string)."
+        print_error_and_exit 'get_window_id() input check' 'Two valid arguments were not passed to the function! Expected a process id (unsigned integer) and a window name (string).'
     fi
     #--all  : Require all conditions to be met.
     #--sync : Wait until a search result is found.
@@ -301,14 +299,16 @@ get_window_id()
     fi
 }
 
-lightshot_process_id=$(get_process_id Lightshot.exe)
+# The Lightshot file name is case-sensitive.
+lightshot_process_id=$( get_process_id Lightshot.exe )
 
 if ! is_uint "$lightshot_process_id"; then
     # shellcheck disable=SC2016
-    print_error_and_exit 'is_uint $lightshot_process_id' "Lightshot process is not running. Launch Lightshot app first, please."
+    print_error_and_exit 'is_uint $lightshot_process_id' 'Lightshot process is not running. Launch Lightshot app first, please.'
 fi
 
-lightshot_window_id=$(get_window_id "$lightshot_process_id" Lightshot)
+# The Lightshot window-id is case-insensitive.
+lightshot_window_id=$( get_window_id "$lightshot_process_id" Lightshot )
 
 if ! is_uint "$lightshot_window_id"; then
     # shellcheck disable=SC2016
@@ -318,8 +318,8 @@ fi
 if xdotool key --window "$lightshot_window_id" "$hotkey"; then
     printf '%s\n' \
         "Success, the hotkey = $hotkey was successfully sent to Lightshot window!" \
-        'However, if Lightshot overlay did not appear, you probably sent a bad hotkey.' \
+        'If the Lightshot overlay did not appear, you likely sent a wrong hotkey.' \
         'In such a case, please adjust the hotkey in Lightshot tray options menu.'
 else
-    print_error_and_exit "xdotool key --window $lightshot_window_id $hotkey" 'The send-hotkey command encountered an error.'
+    print_error_and_exit "xdotool key --window $lightshot_window_id $hotkey" 'The above send-hotkey command encountered an error.'
 fi

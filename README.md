@@ -1,8 +1,8 @@
-[![Download the latest version](https://img.shields.io/badge/Download-Latest%20version-orange)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/releases/latest) &nbsp; &nbsp; &nbsp; &nbsp; [![Donate via PayPal](https://img.shields.io/badge/Donate-via%20PayPal-%23013088)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler#donations) &nbsp; &nbsp; &nbsp; &nbsp; [![GPLv3 License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/blob/master/LICENSE) &nbsp; &nbsp; &nbsp; &nbsp; [![ShellCheck Passing](https://img.shields.io/badge/ShellCheck-Passing-brightgreen)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler)
+[![Download the latest version](https://img.shields.io/badge/Download-Latest%20version-orange)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/releases/latest) &nbsp; &nbsp; &nbsp; &nbsp; [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/blob/master/LICENSE)
 
 ***
 
-# Lightshot print screen Unix handler
+# Lightshot print screen Linux handler
 
 This script handles global print screen keystrokes for you to fully enjoy [Lightshot screenshot tool](https://app.prntscr.com/en/) (home page) on any Linux/Unix.
 
@@ -12,11 +12,11 @@ It is a standard [POSIX](https://en.wikipedia.org/wiki/POSIX) (wiki) shell scrip
 
 - It does not download Lightshot for you.
 - It does not install Lightshot for you.
-- It does not launch Lightshot for you! This is very important.
+- It does not launch Lightshot for you!
 
 ## What the script actually does
 
-This script's sole purpose is to simulate (send) hotkey to Lightshot, be it Print, Control + Print, or anything else completely.
+This script's sole purpose is to simulate/send hotkey to Lightshot, be it Print, Control + Print, or anything else completely.
 
 ***
 
@@ -65,22 +65,23 @@ There is also the help switch (not `--help`):
 which will point out the possibility for you to feed the key combination you have configured in your Lightshot interface without ever editing the script:
 
 ```
-Script  : Lightshot print screen Unix handler
-Version : 7.0 (stable)
-GitHub  : https://git.io/fx2US
+Project: Lightshot print screen Linux handler
+Version: 8.0 (2024-Jun-20)
+GitHub : https://burian.work/lightshot
 --------------------------------------------------------------------
 Description: This script works with XDOTOOL to trigger Print Screen
-key combination in Lightshot application installed on Unix in Wine.
-License: GPL 3.0. The code itself can be further enhanced by others.
+key combination in Lightshot application installed on Linux in Wine.
 The script, however, won't launch Lightshot for you due to variable
 installation locations which make it impossible. You need to run it!
+License is MIT. The code can be further enhanced by others provided
+that any new copies have my copyright notice included in every case.
 --------------------------------------------------------------------
-Usage in terminal: ./lightshot_print_screen [-k "HotKey"]
+Usage in terminal: ./lightshot_print_screen [-k HotKey]
 
-    -k 'HotKey': Optional switch requiring one argument,
+    -k HotKey: Optional switch requiring one argument,
         which is the print screen hotkey combination.
         For the left Control key and the Print Screen key
-        that would be 'Control_L+Print' (as an example).
+        that would be -k Control_L+Print (as an example).
 
     -h: Show this help.
 
@@ -88,28 +89,22 @@ Usage in desktop environment:
 
     You need to find Keyboard shortcuts, and re-map Print to run
     this script, an example from Linux Mint is placed on GitHub.
+
+Author: Copyright 2018-2024 Vlastimil Burián, vlastimilburian@protonmail.com
 ```
 
 ### Graphical interface
 
-There is none. This script however launches the Lightshot screenshot tool directly.
+There is none. This script however launches the Lightshot screenshot tool directly, same as if you right-clicked on its tray icon and then clicked _Take a screenshot_.
 
 ***
 
-## Screenshot from Linux Mint 20 Cinnamon
+## Screenshot from Linux Mint Cinnamon keyboard settings
 
-![Screenshot from Linux Mint 20](https://www.vlastimilburian.cz/github_images/lightshot-linux-mint-20.png)
+![Screenshot from Linux Mint Cinnamon keyboard settings](https://www.vlastimilburian.cz/github_images/lightshot-linux-mint-20.png)
 
 ***
 
 ## Reporting bugs and suggestions
 
-Please open a [new issue ticket](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/issues/new) (direct link) or you can also mail me at [info@vlastimilburian.cz](mailto:info@vlastimilburian.cz) (email link).
-
-***
-
-## Donations
-
-### Donate via PayPal
-
-Donations are possible via my PayPal account issued on the same email address as mentioned above.
+Please open a [new issue ticket](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/issues/new) (direct link) or you can also mail me at [vlastimilburian@protonmail.com](mailto:vlastimilburian@protonmail.com) (email link).
