@@ -23,7 +23,7 @@ This script's sole purpose is to simulate/send hotkey to Lightshot, be it Print,
 ## Requirements
 
 - One necessary command-line tool to have manually installed (same package name):
-	- [`xdotool`](https://manpages.ubuntu.com/manpages/jammy/man1/xdotool.1.html) (Ubuntu man page): In Ubuntu the package is in the _universe_ part of the official archive.
+	- [`xdotool`](https://manpages.ubuntu.com/manpages/noble/man1/xdotool.1.html) (Ubuntu man page): In Ubuntu the package is in the _universe_ part of the official archive.
 
 - One more necessary package which should be pre-installed on most [distributions](https://en.wikipedia.org/wiki/Linux_distribution) (wiki):
 	- `procps` containing [`pgrep`](https://linux.die.net/man/1/pgrep) (man page): In Ubuntu the package is in the _main_ part of the official archive.
