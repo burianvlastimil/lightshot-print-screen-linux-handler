@@ -66,12 +66,12 @@ which will point out the possibility for you to feed the key combination you hav
 
 ```
 Project: Lightshot print screen Linux handler
-Version: 9.0 (2025-Apr-21)
+Version: 10.0 (final for X11) released 2025-Nov-11
 GitHub : https://burian.work/lightshot
 --------------------------------------------------------------------
 Description: This script works with XDOTOOL to trigger Print Screen
 key combination in Lightshot application installed on Linux in Wine.
-The script, however, won't launch Lightshot for you due to variable
+The script however will not launch Lightshot for you due to variable
 installation locations which make it impossible. You need to run it!
 License is MIT. The code can be further enhanced by others provided
 that any new copies have my copyright notice included in every case.
@@ -92,7 +92,7 @@ Usage in desktop environment:
 
 Author:
     Copyright 2018-2025
-    Vlastimil Burián
+    Vlastimil Burian
     info@vlastimilburian.cz
 ```
 

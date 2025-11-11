@@ -1,75 +1,64 @@
 #!/bin/sh
 
-#--------------------------------------------------------------------------------
-#--                    Lightshot print screen Linux handler                    --
-#--                     Git: https://burian.work/lightshot                     --
-#--                             Code: POSIX shell                              --
-#--                                License: MIT                                --
-#--                                Version: 9.0                                --
-#--                          Released on: 2025-Apr-21                          --
-#--                      E-mail: info@vlastimilburian.cz                       --
-#--                    Copyright 2018-2025 Vlastimil Burián                    --
-#--------------------------------------------------------------------------------
+################################################################################
+#                                                                              #
+#                Project: Lightshot print screen Linux handler                 #
+#                ---------------------------------------------                 #
+#                    GitHub: https://burian.work/lightshot                     #
+#                           Code: POSIX shell script                           #
+#                                 License: MIT                                 #
+#                            Released: 2025-Nov-11                             #
+#                        Version: 10.0 (final for X11)                         #
+#                       E-mail: info@vlastimilburian.cz                        #
+#                  Copyright: (c) 2018-2025 Vlastimil Burian                   #
+#                                                                              #
+################################################################################
 
-# The hotkey variable is on top for easy set-up; overridable with -k switch.
-# Run this script with -h for complete help to this script with an example.
-# Just run this script to test out, it will print out if Lightshot was found.
-# Set this to the same hotkey which you have set up in your Lightshot options.
-# For the left control key and the print screen key put in Control_L+Print.
-hotkey=Print
+# The hotkey variable is on top for easy set-up; overridable with -k switch, see a short example with -h.
+# Run this script first on terminal to test it out, it will print out if Lightshot was (not) found running.
+# Set it to the same hotkey which you have set up in your Lightshot options, by default there is Print.
+# Example: for the left control key and the print screen key put Control_L+Print in the hotkey variable.
+hotkey='Print'
 
 # Treat unset variables as errors when substituting.
 # Clarification: this means that accessing any unassigned variable
 # produces immediate termination of the script with an error printed.
 set -o nounset
 
-# (bool) Function to test a variable for an integer.
+# (bool) Function to test one argument for an integer.
 is_int()
 {
     case "${1#[+-]}" in
-
-        *[!0123456789]*)
-            return 1
-        ;;
-        '')
-            return 1
-        ;;
-        *)
-            return 0
-        ;;
-
+        (*[!0123456789]*) return 1 ;;
+        ('')              return 1 ;;
+        (*)               return 0 ;;
     esac
 }
 
-# (bool) Function to test a variable for an unsigned integer.
+# (bool) Function to test one argument for an unsigned integer.
 is_uint()
 {
     case "$1" in
-
-        [+-]*)
-            return 1
-        ;;
-
+        ([+-]*) return 1 ;;
     esac
 
     is_int "$1"
 }
 
-# (bool) Function to test a variable for a _safe_ exit code:
-# From unsigned integer in a range <0;125> which is safe range,
-# the remaining range is reserved or otherwise not recommended.
-is_safe_exit_uint()
+# (bool) Function to test one argument for a _safe_ exit code:
+# _Safe_ exit code must be an unsigned integer from the range of <0;125> which is considered
+# the safe range, the remaining range of <126;255> is reserved or otherwise not recommended.
+is_safe_exit()
 {
     is_uint "$1" && [ "$1" -le 125 ]
 }
 
-# (string) Function to detect basic variable types passed to my functions:
+# (string) Function to detect basic argument types passed to my functions:
 # empty, integer, file (with specific info), the rest is considered string.
 dump_args()
 {
     # we do not write anything for 0 arguments
     [ "$#" -eq 0 ] && return 1
-    exec >&2
     i=1
     printf '%s\n' \
         "dump_args()" \
@@ -89,47 +78,53 @@ dump_args()
         shift
         i=$(( i + 1 ))
     done
-}
+} >&2
 
 # (string) Function to print an error message.
-print_error()
+error_print()
 {
-    printf >&2 '%s\n' \
+    printf '%s\n' \
         "Error heading: $1" \
         "Error message: $2"
-}
+} >&2
 
 # (string) Function to print an error message and exit right away.
-print_error_and_exit()
+error()
 {
+    # Original logic waiting to be translated to the "opposite" logic:
     if ! { [ "$#" -eq 2 ] && [ -n "$1" ] && [ -n "$2" ]; } &&
-       ! { [ "$#" -eq 3 ] && [ -n "$1" ] && [ -n "$2" ] && [ "$3" -ge 1 ] && is_safe_exit_uint "$3"; } then
+       ! { [ "$#" -eq 3 ] && [ -n "$1" ] && [ -n "$2" ] && [ "$3" -ge 1 ] && is_safe_exit "$3"; }; then
         dump_args "$@"
         # shellcheck disable=SC2016
-        printf >&2 '%s\n' \
-            'print_error_and_exit() input check' \
+        printf '%s\n' \
+            'error() input check' \
             'Wrong number, type or empty arguments have been passed to the function.' \
             'Expected the following strings: $1 = error heading, $2 = error message.' \
             'Optionally, accepting a number: $3 = exit code; if not given 1 is used.' \
             'Acceptable exit code range: anywhere between <1;125>; 1 is the default.'
         exit 1
     fi
-    print_error "$1" "$2"
+    error_print "$1" "$2"
     exit "${3:-1}"
+} >&2
+
+user_id()
+{
+    id -u
 }
 
-if [ "$( id -u )" -eq 0 ]; then
-    print_error_and_exit 'is_user_root()' 'Running this script with root privileges is not recommended! Expected an ordinary user.'
+if [ "$( user_id )" -eq 0 ]; then
+    error 'user_id()' 'Running this script with root privileges is not recommended! Expected an ordinary user.'
 fi
 
-check_requirements()
+dependencies()
 {
     if [ "$#" -eq 0 ]; then
-        print_error_and_exit 'check_requirements() input check' 'No arguments passed to the function! At least one program/package name pair expected.'
+        error 'dependencies() input check' 'No arguments passed to the function! At least one program/package name pair expected.'
     fi
     if [ "$(( $# % 2 ))" -ne 0 ]; then
         dump_args "$@"
-        print_error_and_exit 'check_requirements() input check' 'Odd number of arguments has been passed to the function. Program and package names in pairs expected.'
+        error 'dependencies() input check' 'Odd number of arguments has been passed to the function. Program and package names in pairs expected.'
     fi
 
     dependency_missing=false
@@ -137,7 +132,7 @@ check_requirements()
     while [ "$#" -gt 0 ]; do
         if ! command -v "$1" >/dev/null 2>&1; then
             dependency_missing=true
-            print_error 'check_requirements(): unmet required dependency' "This script requires '$1' program but it is not available on this system! On Ubuntu/Debian OS, just install the '$2' package; other systems may differ."
+            error_print 'dependencies(): unmet required dependency' "This script requires '$1' program but it is not available on this system! On Ubuntu/Debian OS, just install the '$2' package; other systems may differ."
         fi
         shift 2
     done
@@ -147,28 +142,29 @@ check_requirements()
     fi
 }
 
-check_requirements \
+dependencies \
     pgrep      procps \
     xdotool    xdotool
 
-print_usage_and_exit()
+usage()
 {
-    if ! { [ "$#" -eq 1 ] && is_safe_exit_uint "$1"; } then
+    if [ "$#" -ne 1 ] || ! is_safe_exit "$1"; then
         dump_args "$@"
         # shellcheck disable=SC2016
-        print_error_and_exit 'print_usage_and_exit() input check' 'Number required: $1 = exit code from the script.'
+        error 'usage() input check' 'One number required: $1 = exit code from the script.'
     fi
 
+    # conditional redirect to stderr, depending on zero (stdout) / stderr (non-zero) exit code
     [ "$1" -ne 0 ] && exec >&2
 
-cat <<EOF
+    cat <<EOF
 Project: Lightshot print screen Linux handler
-Version: 9.0 (2025-Apr-21)
+Version: 10.0 (final for X11) released 2025-Nov-11
 GitHub : https://burian.work/lightshot
 --------------------------------------------------------------------
 Description: This script works with XDOTOOL to trigger Print Screen
 key combination in Lightshot application installed on Linux in Wine.
-The script, however, won't launch Lightshot for you due to variable
+The script however will not launch Lightshot for you due to variable
 installation locations which make it impossible. You need to run it!
 License is MIT. The code can be further enhanced by others provided
 that any new copies have my copyright notice included in every case.
@@ -189,7 +185,7 @@ Usage in desktop environment:
 
 Author:
     Copyright 2018-2025
-    Vlastimil Burián
+    Vlastimil Burian
     info@vlastimilburian.cz
 EOF
 
@@ -200,52 +196,46 @@ while getopts ':hk:' option; do
 
     case "$option" in
 
-        k)
+        (k)
             hotkey=$OPTARG
             shift 2
         ;;
-        h)
-            print_usage_and_exit 0
+
+        (h)
+            usage 0
         ;;
-        *)
+
+        (*)
             dump_args "$@"
-            print_usage_and_exit 1
+            usage 1
         ;;
 
     esac
 
 done
 
-
-# This was simulated and IDK how to prevent erroring out without catching it:
-#./lightshot_print_screen -k -k
-
-# Possible problem under my question here, suggesting including the command below, investigate:
-# https://unix.stackexchange.com/a/778450/126755
-#shift $(( OPTIND - 1 ))
-
-
 if [ "$#" -ne 0 ]; then
     dump_args "$@"
-    print_usage_and_exit 2  # Changed from 1 to 2 for debugging the problem above
+    usage 1
 fi
 
 get_process_id()
 {
-    if ! { [ "$#" -eq 1 ] && [ -n "$1" ]; } then
+    if [ "$#" -ne 1 ] || [ -z "$1" ]; then
         dump_args "$@"
         # shellcheck disable=SC2016
-        print_error_and_exit 'get_process_id() input check' 'String required: $1 = a process name to find id to.'
+        error 'get_process_id() input check' 'String required: $1 = a process name to find id to.'
     fi
-    # -o, --oldest: select least recently started
-    pgrep -o "$1"
+    #-o, --oldest: least recently started
+    #-u, --euid  : match by effective UID
+    pgrep "$1" -o -u "$( user_id )"
 }
 
 get_window_id()
 {
-    if ! { [ "$#" -eq 2 ] && is_uint "$1" && [ -n "$2" ]; } then
+    if [ "$#" -ne 2 ] || ! is_uint "$1" || [ -z "$2" ]; then
         dump_args "$@"
-        print_error_and_exit 'get_window_id() input check' 'Two valid arguments were not passed to the function! Expected a process id (unsigned integer) and a window name (string).'
+        error 'get_window_id() input check' 'Two valid arguments were not passed to the function! Expected a process id (unsigned integer) and a window name (string).'
     fi
     #--all  : Require all conditions to be met.
     #--sync : Wait until a search result is found.
@@ -253,7 +243,7 @@ get_window_id()
     #--pid  : Match windows that belong to a specific process id.
     #--name : Match against the window name. This is the same string that is displayed in the window titlebar.
     if ! xdotool search --all --sync --limit 1 --pid "$1" --name "$2"; then
-        print_error_and_exit 'get_window_id()' "No window matching process id '$1' and window name '$2' has been found."
+        error 'get_window_id()' "No window matching process id '$1' and window name '$2' has been found."
     fi
 }
 
@@ -262,7 +252,7 @@ lightshot_process_id=$( get_process_id Lightshot.exe )
 
 if ! is_uint "$lightshot_process_id"; then
     # shellcheck disable=SC2016
-    print_error_and_exit 'is_uint $lightshot_process_id' 'Lightshot process is not running. Launch Lightshot app first, please.'
+    error 'is_uint $lightshot_process_id' 'Lightshot process is not running. Launch Lightshot app first, please.'
 fi
 
 # The Lightshot window name is case-insensitive.
@@ -270,7 +260,7 @@ lightshot_window_id=$( get_window_id "$lightshot_process_id" Lightshot )
 
 if ! is_uint "$lightshot_window_id"; then
     # shellcheck disable=SC2016
-    print_error_and_exit 'is_uint $lightshot_window_id' 'Lightshot process was found (is running) but its window was not found for some reason / get_window_id() returned an empty value.'
+    error 'is_uint $lightshot_window_id' 'Lightshot process was found (is running) but its window was not found for some reason / get_window_id() returned an empty value.'
 fi
 
 if xdotool key --window "$lightshot_window_id" "$hotkey"; then
@@ -279,5 +269,5 @@ if xdotool key --window "$lightshot_window_id" "$hotkey"; then
         'If the Lightshot overlay did not appear, you likely sent a wrong hotkey.' \
         'In such a case, please adjust the hotkey in Lightshot tray options menu.'
 else
-    print_error_and_exit "xdotool key --window $lightshot_window_id $hotkey" 'The above send-hotkey command encountered an unknown error.'
+    error "xdotool key --window $lightshot_window_id $hotkey" 'The above send-hotkey command encountered an unknown error.'
 fi
