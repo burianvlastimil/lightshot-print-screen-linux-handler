@@ -1,5 +1,7 @@
 [![Download the latest version](https://img.shields.io/badge/Download-Latest%20version-orange)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/releases/latest) &nbsp; &nbsp; &nbsp; &nbsp; [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/blob/master/LICENSE)
 
+> **Project Status Update (2026-May-21):** This project has reached its final destination for X11 and is now archived. If you are using a modern Wayland compositor, feel free to fork this project and upgrade the window-handling logic for your environment. Thank you all for the support!
+
 ***
 
 # Lightshot print screen Linux handler
