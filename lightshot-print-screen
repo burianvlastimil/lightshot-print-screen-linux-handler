@@ -7,10 +7,10 @@
 #                    GitHub: https://burian.work/lightshot                     #
 #                           Code: POSIX shell script                           #
 #                                 License: MIT                                 #
-#                            Released: 2025-Nov-11                             #
-#                        Version: 10.0 (final for X11)                         #
+#                            Released: 2026-May-21                             #
+#                      Version: 10.2 (2nd final for X11)                       #
 #                       E-mail: info@vlastimilburian.cz                        #
-#                  Copyright: (c) 2018-2025 Vlastimil Burian                   #
+#                  Copyright: (c) 2018-2026 Vlastimil Burian                   #
 #                                                                              #
 ################################################################################
 
@@ -159,7 +159,7 @@ usage()
 
     cat <<EOF
 Project: Lightshot print screen Linux handler
-Version: 10.0 (final for X11) released 2025-Nov-11
+Version: 10.2 (2nd final for X11) released 2026-May-21
 GitHub : https://burian.work/lightshot
 --------------------------------------------------------------------
 Description: This script works with XDOTOOL to trigger Print Screen
@@ -184,7 +184,7 @@ Usage in desktop environment:
     this script, an example from Linux Mint is placed on GitHub.
 
 Author:
-    Copyright 2018-2025
+    Copyright 2018-2026
     Vlastimil Burian
     info@vlastimilburian.cz
 EOF
@@ -198,7 +198,6 @@ while getopts ':hk:' option; do
 
         (k)
             hotkey=$OPTARG
-            shift 2
         ;;
 
         (h)
@@ -213,6 +212,7 @@ while getopts ':hk:' option; do
     esac
 
 done
+shift $(( OPTIND - 1 ))
 
 if [ "$#" -ne 0 ]; then
     dump_args "$@"

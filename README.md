@@ -1,4 +1,4 @@
-[![Download the latest version](https://img.shields.io/badge/Download-Latest%20version-orange)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/releases/latest) &nbsp; &nbsp; &nbsp; &nbsp; [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/?tab=MIT-1-ov-file)
+[![Download the latest version](https://img.shields.io/badge/Download-Latest%20version-orange)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/releases/latest) &nbsp; &nbsp; &nbsp; &nbsp; [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/burianvlastimil/lightshot-print-screen-linux-handler/blob/master/LICENSE)
 
 ***
 
@@ -66,7 +66,7 @@ which will point out the possibility for you to feed the key combination you hav
 
 ```
 Project: Lightshot print screen Linux handler
-Version: 10.0 (final for X11) released 2025-Nov-11
+Version: 10.2 (2nd final for X11) released 2026-May-21
 GitHub : https://burian.work/lightshot
 --------------------------------------------------------------------
 Description: This script works with XDOTOOL to trigger Print Screen
@@ -91,7 +91,7 @@ Usage in desktop environment:
     this script, an example from Linux Mint is placed on GitHub.
 
 Author:
-    Copyright 2018-2025
+    Copyright 2018-2026
     Vlastimil Burian
     info@vlastimilburian.cz
 ```
